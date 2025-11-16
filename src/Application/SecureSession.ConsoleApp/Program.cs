@@ -3,6 +3,10 @@ using SecureSession.ConsoleApp.Extensions;
 using SecureSession.ConsoleApp.Helpers.Abstract;
 using SecureSession.ConsoleApp.Items;
 
+/// <summary>
+/// Author: Can DOĞU
+/// Basitçe tüm bireysel cihaz veya oturumların şifreleme anahtarlarının dinamik oluştuğu ve paylaşıldığı infrastructure
+/// </summary>
 internal class Program
 {
     static async Task Main()
