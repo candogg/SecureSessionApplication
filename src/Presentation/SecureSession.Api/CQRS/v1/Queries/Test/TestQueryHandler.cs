@@ -12,9 +12,9 @@ namespace SecureSession.Api.CQRS.v1.Queries.Test
     /// Author: Can DOĞU
     /// </summary>
     public sealed class TestQueryHandler(IMongoUnitOfWork mUnitOfWork)
-        : IRequestHandler<TestQuery, ResponseItem<TestResponseDto>>
+        : IRequestHandler<TestQuery, ResponseItem<CryptedDto>>
     {
-        public async Task<ResponseItem<TestResponseDto>> Handle(TestQuery request, CancellationToken cancellationToken)
+        public async Task<ResponseItem<CryptedDto>> Handle(TestQuery request, CancellationToken cancellationToken)
         {
             if (request is null || request.Request is null || request.Request.ClientSessionCode.IsNullOrEmpty())
             {
@@ -35,14 +35,18 @@ namespace SecureSession.Api.CQRS.v1.Queries.Test
             var userRequest = userRequestUtf8.Deserialize<TestPackageDto>()
                 ?? throw new Exception("Hatalı istek");
 
-            var serverAnswer = $"Your name is {userRequest.Name} {userRequest.Surname}. Welcome!";
-
             var responseDto = new TestResponseDto
             {
-                Data = CryptoHelper.GetInstance.EncryptString(serverAnswer, userSessionKeys.AesKey, userSessionKeys.AesIv)
+                Data = $"Sayın {userRequest.Name}, hoşgeldiniz!"
             };
 
-            return ResponseItem<TestResponseDto>.GenerateSuccess(responseDto);
+            var cryptedDto = new CryptedDto
+            {
+                ClientSessionCode = request.Request.ClientSessionCode,
+                Data = CryptoHelper.GetInstance.EncryptString(responseDto.Serialize(), userSessionKeys.AesKey, userSessionKeys.AesIv)
+            };
+
+            return ResponseItem<CryptedDto>.GenerateSuccess(cryptedDto);
         }
     }
 }

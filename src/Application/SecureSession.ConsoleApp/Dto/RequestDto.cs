@@ -5,6 +5,6 @@
     /// </summary>
     public sealed class RequestDto
     {
-        public CryptedRequestDto? Request { get; set; }
+        public CryptedDto? Request { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace SecureSession.ConsoleApp.Helpers.Abstract
             }
         }
 
-        private async Task<bool> CreateTunnelAsync()
+        public async Task<bool> CreateTunnelAsync()
         {
             var result = await HttpHelper.GetInstance.GetAsync<ResponseItem<SessionExchangeDto>>("https://localhost:7138/api/session/getpublickey", CancellationToken.None);
 
@@ -74,7 +74,7 @@ namespace SecureSession.ConsoleApp.Helpers.Abstract
             return true;
         }
 
-        public async Task<CryptedRequestDto?> CryptPackageAsync<T>(T? data)
+        public async Task<RequestDto?> CryptPackageAsync<T>(T? data)
         {
             if (data is null)
             {
@@ -89,11 +89,16 @@ namespace SecureSession.ConsoleApp.Helpers.Abstract
                 }
             }
 
-            return new CryptedRequestDto
+            var requestDto = new RequestDto
             {
-                ClientSessionCode = sessionParameters.ClientSessionCode!,
-                Data = CryptoHelper.GetInstance.EncryptString(data.Serialize(), sessionParameters.ClientSessionKey, sessionParameters.ClientSessionIV)
+                Request = new CryptedDto
+                {
+                    ClientSessionCode = sessionParameters.ClientSessionCode!,
+                    Data = CryptoHelper.GetInstance.EncryptString(data.Serialize(), sessionParameters.ClientSessionKey, sessionParameters.ClientSessionIV)
+                }
             };
+
+            return requestDto;
         }
 
         public TResponse? DecryptPackage<TResponse>(string? data)
